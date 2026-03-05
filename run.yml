@@ -1,0 +1,6 @@
+---
+- name: Install Nagios Core
+  hosts: all
+  become: yes
+  roles:
+    - nagios
