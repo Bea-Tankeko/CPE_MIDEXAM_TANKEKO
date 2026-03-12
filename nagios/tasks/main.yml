@@ -1,24 +1,4 @@
 ---
-- name: Show detected OS
-  debug:
-    var: ansible_distribution
-
-- name: Install dependencies (Ubuntu)
-  apt:
-    name:
-      - apache2
-      - build-essential
-      - libgd-dev
-      - libssl-dev
-      - unzip
-      - php
-      - libapache2-mod-php
-      - wget
-      - curl
-      - apache2-utils
-    state: present
-    update_cache: yes
-  when: ansible_distribution | lower == "ubuntu"
 
 - name: Install dependencies (CentOS)
   yum:
@@ -87,32 +67,7 @@
   args:
     chdir: /tmp/nagios-4.4.14
     executable: /bin/bash
-
-- name: Enable Apache CGI (Ubuntu)
-  command: a2enmod cgi
-  when: ansible_distribution | lower == "ubuntu"
-
-- name: Enable Apache rewrite (Ubuntu)
-  command: a2enmod rewrite
-  when: ansible_distribution | lower == "ubuntu"
-
-- name: Restart Apache (Ubuntu)
-  service:
-    name: apache2
-    state: restarted
-  when: ansible_distribution | lower == "ubuntu"
-
-- name: Disable SELinux temporarily (CentOS)
-  command: setenforce 0
-  ignore_errors: yes
-  when: ansible_distribution | lower == "centos"
-
-- name: Set SELinux to permissive permanently (CentOS)
-  selinux:
-    policy: targeted
-    state: permissive
-  when: ansible_distribution | lower == "centos"
-
+    
 - name: Download Nagios Plugins
   get_url:
     url: https://nagios-plugins.org/download/nagios-plugins-2.3.3.tar.gz
@@ -152,33 +107,17 @@
     /usr/local/nagios/etc/htpasswd.users nagios 123
   ignore_errors: yes
 
-- name: Reload systemd
-  command: systemctl daemon-reload
-  ignore_errors: yes
-
 - name: Restart Apache
   service:
     name: "{{ 'apache2' if ansible_distribution | lower == 'ubuntu' else 'httpd' }}"
     state: restarted
     enabled: yes
 
-- name: Verify Nagios configuration
-  shell: /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
-  register: nagios_check
-  failed_when: "'Things look okay' not in nagios_check.stdout"
-
 - name: Restart Nagios
   service:
     name: nagios
     state: restarted
     enabled: yes
-
-- name: Open HTTP port (Ubuntu)
-  ufw:
-    rule: allow
-    port: 80
-    proto: tcp
-  when: ansible_distribution | lower == "ubuntu"
 
 - name: Open HTTP port (CentOS)
   firewalld:

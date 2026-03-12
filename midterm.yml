@@ -1,0 +1,12 @@
+--- 
+- name: Install Nagios (CentOS)
+  hosts: web_servers 
+  become: yes
+  roles:
+    - nagios
+
+- name: Install ElasticSearch
+  hosts: workstations 
+  become: yes
+  roles:
+    - Elastic
