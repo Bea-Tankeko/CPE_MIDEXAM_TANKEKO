@@ -1,0 +1,24 @@
+--- 
+- name: Install Nagios (CentOS)
+  hosts: web_servers
+  become: yes
+  roles:
+    - nagios
+
+- name: Install Kibana
+  hosts: workstations
+  become: yes
+  roles:
+    - kibana
+
+- name: Install logstash
+  hosts: workstastions
+  become: yes
+  roles:
+    - logstash
+
+- name: Install Lampstack
+  hosts: workstations
+  become: yes
+  roles:
+    -lampstack
